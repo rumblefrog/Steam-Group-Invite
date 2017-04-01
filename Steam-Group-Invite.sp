@@ -4,7 +4,7 @@
 #define PLUGIN_VERSION "1.00"
 
 #include <sourcemod>
-#include <steamworks>
+#include <SteamWorks>
 #include <steamcore>
 #include <morecolors>
 
