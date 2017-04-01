@@ -12,6 +12,12 @@ A simple plugin that invites the player to the desired group on command trigger
 - [SteamWorks Extension](https://users.alliedmods.net/~kyles/builds/SteamWorks/)
 - [SteamCore Plugin](https://github.com/polvora/SteamCore/releases)
 
+# Installing
+
+1. Download and extract SteamWorks to **addons/sourcemod/extensions**
+2. Download and extract SteamCore to **addons/sourcemod/plugins**
+3. Edit server.cfg and add the listed [convars](#convars)
+
 # Find Your Group ID64
 
 1. Goto https://steamcommunity.com/groups/<GroupName>/memberslistxml/ (Replace <GroupName> with your group name)
