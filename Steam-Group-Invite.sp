@@ -26,7 +26,7 @@ public void OnPluginStart()
 {
 	CreateConVar("sgi_version", PLUGIN_VERSION, "Steam Group Invite", FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 	
-	cGroupID = CreateConVar("sgi_groupid", "0", "Group ID | Ex: 103582791455186986", 0, true, 0.0);
+	cGroupID = CreateConVar("sgi_groupid", "0", "Group ID | Ex: 103582791457828777", 0, true, 0.0);
 	
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	
