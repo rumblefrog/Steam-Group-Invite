@@ -22,7 +22,7 @@ A simple plugin that invites the player to the desired group on command trigger
 
 - There might be a server freeze for about **0.5** second while it's performing RSA calculation which only occurs once per session
 - Steam username/password must be <= 32 characters
-- Steam only allows 64 bit group ID
+- Steam only allows 64-bit group ID
 
 # Download 
 
