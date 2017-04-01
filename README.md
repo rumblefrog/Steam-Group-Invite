@@ -5,7 +5,7 @@ A simple plugin that invites the player to the desired group on command trigger
 
 - **sc_username** (Steam account username)
 - **sc_password** (Steam account password)
-- **sgi_groupid** ([Group ID64](#Find-Your-Group-ID64)) 
+- **sgi_groupid** ([Group ID64](#find-your-group-id64)) 
 
 # Prerequisite
 
@@ -16,7 +16,7 @@ A simple plugin that invites the player to the desired group on command trigger
 
 1. Goto https://steamcommunity.com/groups/<GroupName>/memberslistxml/ (Replace <GroupName> with your group name)
 2. Search for numbers encased in <groupID64> (Ex: <groupID64>103582791457828777</groupID64>)
-3. Use that number in [**sgi_groupid**](#Convars)
+3. Use that number in [**sgi_groupid**](#convars)
 
 # Note
 
