@@ -1,6 +1,10 @@
 # Steam-Group-Invite [![Build Status](https://travis-ci.org/RumbleFrog/Steam-Group-Invite.svg?branch=master)](https://travis-ci.org/RumbleFrog/Steam-Group-Invite)
 A simple plugin that invites the player to the desired group on command trigger
 
+# Usage
+
+- sm_invite (!invite | /invite)
+
 # Convars
 
 - **sc_username** (Steam account username)
