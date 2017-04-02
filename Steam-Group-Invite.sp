@@ -82,6 +82,8 @@ public Action InGroupCmd(int client, int args)
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently in the Steam group.");
 	else
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently not in the Steam group. %s", GroupID32);
+		
+	return Plugin_Handled;
 }
 
 public Action Core_Cooldown(Handle timer, any data)
