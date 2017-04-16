@@ -32,6 +32,7 @@ SOFTWARE.
 #include <steamcore>
 #include <morecolors>
 #include <bigint>
+#include <steamtools>
 
 #pragma newdecls required
 
@@ -68,7 +69,7 @@ public void OnPluginStart()
 	hexString2BigInt(GroupID, IntArray, sizeof IntArray);
 	hexString2BigInt("103582791429521408", IntArraySub, sizeof IntArraySub);
 	
-	subBigInt(IntArray, IntArraySub, 16, Int32, sizeof Int32);
+	subBigInt(IntArray, IntArraySub, 10, Int32, sizeof Int32);
 	
 	bigInt2HexString(Int32, GroupID32, sizeof GroupID32);
 }
@@ -145,21 +146,18 @@ public void SteamCore_CallBack(int iClient, bool bSuccess, int iErrorCode, any d
 
 public void OnClientPostAdminCheck(int iClient)
 {
-	if (!StrEqual(GroupID32, "0") && !StrEqual(GroupID32, "0.0"))
+	if (!StrEqual(GroupID32, "0"))
 	{
 		if (!SteamWorks_GetUserGroupStatus(iClient, StringToInt(GroupID32)))
 		{
 			CPrintToChat(iClient, "{lightseagreen}[SGI] {grey}Request overflow. Please try again later.");
 			return;
-		}
-		
-		CPrintToChat(iClient, "{lightseagreen}[SGI] {grey}Requesting...");
+		}		
 	}
 }
 
 public int SteamWorks_OnClientGroupStatus(int authid, int groupid, bool isMember, bool isOfficer)
 {
-	CPrintToChatAll("{lightseagreen}[SGI] {grey}Received Request. %i", groupid);
 	
 	if (groupid != StringToInt(GroupID32))
 		return;
@@ -181,6 +179,35 @@ public int SteamWorks_OnClientGroupStatus(int authid, int groupid, bool isMember
 		InGroup[iClient] = true;
 		return;
 	}
+	
+	return;
+	
+}
+
+//In cases where Steamtools is also loaded and Steamworks fails to see the callback
+public int Steam_GroupStatusResult(int client, int groupAccountID, bool groupMember, bool groupOfficer)
+{
+	
+	if (groupAccountID != StringToInt(GroupID32))
+		return;	
+	
+	if (client == -1)
+		return;
+		
+	if (!groupMember && !groupOfficer)
+	{
+		CPrintToChat(client, "{lightseagreen}[SGI] {grey}Consider joining our group using !invite.");
+		return;
+	}
+	
+	if (groupMember || groupOfficer)
+	{
+		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are in our group, hurray!");
+		InGroup[client] = true;
+		return;
+	}
+	
+	return;
 	
 }
 
