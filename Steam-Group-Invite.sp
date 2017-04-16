@@ -108,7 +108,7 @@ public Action InGroupCmd(int client, int args)
 	if (InGroup[client])
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently in the Steam group.");
 	else
-		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently not in the Steam group. %s", GroupID32);
+		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently not in the Steam group");
 		
 	return Plugin_Handled;
 }
