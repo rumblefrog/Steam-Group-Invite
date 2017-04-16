@@ -58,6 +58,8 @@ public void OnPluginStart()
 	cGroupID = CreateConVar("sgi_groupid", "0", "Group ID | Ex: 103582791457828777", 0, true, 0.0);
 	
 	cGroupID.GetString(GroupID, sizeof GroupID);
+	
+	HookConVarChange(cGroupID, OnGroupIDChanged);
 		
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	RegConsoleCmd("sm_ingroup", InGroupCmd, "Checks if the client is in desired Steam group");
@@ -67,14 +69,7 @@ public void OnPluginStart()
 	
 	InCoolDown = CreateArray();
 	
-	int IntArray[1024], IntArraySub[1024], Int32[1024];
-	
-	hexString2BigInt(GroupID, IntArray, sizeof IntArray);
-	hexString2BigInt("103582791429521408", IntArraySub, sizeof IntArraySub);
-	
-	subBigInt(IntArray, IntArraySub, 10, Int32, sizeof Int32);
-	
-	bigInt2HexString(Int32, GroupID32, sizeof GroupID32);
+	CalculateGroupID32();
 }
 
 public Action InviteCmd(int client, int args)
@@ -112,6 +107,24 @@ public Action InGroupCmd(int client, int args)
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently not in the Steam group");
 		
 	return Plugin_Handled;
+}
+
+public void OnGroupIDChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	cGroupID.GetString(GroupID, sizeof GroupID);
+	CalculateGroupID32();
+}
+
+void CalculateGroupID32()
+{
+	int IntArray[1024], IntArraySub[1024], Int32[1024];
+	
+	hexString2BigInt(GroupID, IntArray, sizeof IntArray);
+	hexString2BigInt("103582791429521408", IntArraySub, sizeof IntArraySub);
+	
+	subBigInt(IntArray, IntArraySub, 10, Int32, sizeof Int32);
+	
+	bigInt2HexString(Int32, GroupID32, sizeof GroupID32);
 }
 
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
