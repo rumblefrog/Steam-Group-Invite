@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.0"
+#define PLUGIN_VERSION "1.1.1"
 
 #include <sourcemod>
 #include <SteamWorks>
@@ -62,7 +62,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	RegConsoleCmd("sm_ingroup", InGroupCmd, "Checks if the client is in desired Steam group");
 	
-	HookEvent("teamplay_setup_finished", OnSetupFinished, EventHookMode_PostNoCopy);
+	//Check for game types in later versions
+	HookEvent("teamplay_round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	
 	InCoolDown = CreateArray();
 	
@@ -80,7 +81,7 @@ public Action InviteCmd(int client, int args)
 {
 	int AccountID = GetSteamAccountID(client);
 	
-	if (StrEqual(GroupID, "0") || StrEqual(GroupID, "0.0"))
+	if (StrEqual(GroupID, "0"))
 	{
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}Group ID Convar not setup.");
 		return Plugin_Handled;
@@ -113,7 +114,7 @@ public Action InGroupCmd(int client, int args)
 	return Plugin_Handled;
 }
 
-public void OnSetupFinished(Event event, const char[] name, bool dontBroadcast)
+public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{
