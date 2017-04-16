@@ -21,6 +21,7 @@ before_script:
     - cp include/morecolors.inc addons/sourcemod/scripting/include
     - cp include/steamcore.inc addons/sourcemod/scripting/include
     - cp include/SteamWorks.inc addons/sourcemod/scripting/include
+    - cp include/steamtools.inc addons/sourcemod/scripting/include
     - cp include/bigint.inc addons/sourcemod/scripting/include
     - cd addons/sourcemod/scripting/
     - chmod +x spcomp
