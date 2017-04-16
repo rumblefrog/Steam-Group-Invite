@@ -62,6 +62,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	RegConsoleCmd("sm_ingroup", InGroupCmd, "Checks if the client is in desired Steam group");
 	
+	HookEvent("teamplay_setup_finished", OnSetupFinished, EventHookMode_PostNoCopy);
+	
 	InCoolDown = CreateArray();
 	
 	int IntArray[1024], IntArraySub[1024], Int32[1024];
@@ -109,6 +111,18 @@ public Action InGroupCmd(int client, int args)
 		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are currently not in the Steam group. %s", GroupID32);
 		
 	return Plugin_Handled;
+}
+
+public void OnSetupFinished(Event event, const char[] name, bool dontBroadcast)
+{
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (Client_IsValid(i))
+		{
+			if (!InGroup[i])
+				PrintHintText(i, "Consider joining our group using !invite");
+		}
+	}
 }
 
 public Action Core_Cooldown(Handle timer, any data)
@@ -166,16 +180,9 @@ public int SteamWorks_OnClientGroupStatus(int authid, int groupid, bool isMember
 	
 	if (iClient == -1)
 		return;
-		
-	if (!isMember && !isOfficer)
-	{
-		CPrintToChat(iClient, "{lightseagreen}[SGI] {grey}Consider joining our group using !invite.");
-		return;
-	}
-	
+			
 	if (isMember || isOfficer)
 	{
-		CPrintToChat(iClient, "{lightseagreen}[SGI] {grey}You are in our group, hurray!");
 		InGroup[iClient] = true;
 		return;
 	}
@@ -193,16 +200,9 @@ public int Steam_GroupStatusResult(int client, int groupAccountID, bool groupMem
 	
 	if (client == -1)
 		return;
-		
-	if (!groupMember && !groupOfficer)
-	{
-		CPrintToChat(client, "{lightseagreen}[SGI] {grey}Consider joining our group using !invite.");
-		return;
-	}
-	
+			
 	if (groupMember || groupOfficer)
 	{
-		CPrintToChat(client, "{lightseagreen}[SGI] {grey}You are in our group, hurray!");
 		InGroup[client] = true;
 		return;
 	}
@@ -229,4 +229,21 @@ public int GetUserFromAuthID(int authid)
         }
     }
     return -1;
+}
+
+stock bool Client_IsValid(int client, bool checkConnected=true)
+{
+	if (client > 4096) {
+		client = EntRefToEntIndex(client);
+	}
+
+	if (client < 1 || client > MaxClients) {
+		return false;
+	}
+
+	if (checkConnected && !IsClientConnected(client)) {
+		return false;
+	}
+
+	return true;
 }
