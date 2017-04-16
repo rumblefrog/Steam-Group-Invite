@@ -3,7 +3,8 @@ A simple plugin that invites the player to the desired group on command trigger
 
 # Usage
 
-- sm_invite (!invite | /invite)
+- sm_invite
+- sm_ingroup
 
 # Convars
 
