@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.1"
+#define PLUGIN_VERSION "1.1.2"
 
 #include <sourcemod>
 #include <SteamWorks>
@@ -41,6 +41,7 @@ Handle InCoolDown;
 char GroupID[64];
 char GroupID32[64];
 bool InGroup[MAXPLAYERS + 1];
+EngineVersion g_EngineVersion;
 
 public Plugin myinfo = 
 {
@@ -64,12 +65,11 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	RegConsoleCmd("sm_ingroup", InGroupCmd, "Checks if the client is in desired Steam group");
 	
-	//Check for game types in later versions
-	HookEvent("teamplay_round_start", OnRoundStart, EventHookMode_PostNoCopy);
-	
 	InCoolDown = CreateArray();
 	
 	CalculateGroupID32();
+	
+	HookGameStart();
 }
 
 public Action InviteCmd(int client, int args)
@@ -127,7 +127,22 @@ void CalculateGroupID32()
 	bigInt2HexString(Int32, GroupID32, sizeof GroupID32);
 }
 
-public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
+void HookGameStart()
+{
+	g_EngineVersion = GetEngineVersion();
+		
+	switch (g_EngineVersion)
+	{
+		case Engine_TF2, Engine_CSS:
+			HookEvent("teamplay_round_start", OnGameEventStart, EventHookMode_PostNoCopy);
+		case Engine_CSGO, Engine_Left4Dead2, Engine_HL2DM:
+			HookEvent("round_start", OnGameEventStart, EventHookMode_PostNoCopy);
+		case Engine_DODS:
+			HookEvent("dod_round_start", OnGameEventStart, EventHookMode_PostNoCopy);
+	}
+}
+
+public void OnGameEventStart(Event event, const char[] name, bool dontBroadcast)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{
