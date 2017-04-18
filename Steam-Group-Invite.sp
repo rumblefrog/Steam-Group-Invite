@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.2"
+#define PLUGIN_VERSION "1.1.3"
 
 #include <sourcemod>
 #include <SteamWorks>
@@ -260,19 +260,16 @@ public int GetUserFromAuthID(int authid)
     return -1;
 }
 
-stock bool Client_IsValid(int client, bool checkConnected=true)
+stock bool Client_IsValid(int iClient, bool bAlive = false)
 {
-	if (client > 4096) {
-		client = EntRefToEntIndex(client);
+	if (iClient >= 1 &&
+	iClient <= MaxClients &&
+	IsClientConnected(iClient) &&
+	IsClientInGame(iClient) &&
+	(bAlive == false || IsPlayerAlive(iClient)))
+	{
+		return true;
 	}
 
-	if (client < 1 || client > MaxClients) {
-		return false;
-	}
-
-	if (checkConnected && !IsClientConnected(client)) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
