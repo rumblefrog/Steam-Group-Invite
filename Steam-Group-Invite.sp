@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.3"
+#define PLUGIN_VERSION "1.1.4"
 
 #include <sourcemod>
 #include <SteamWorks>
@@ -266,6 +266,7 @@ stock bool Client_IsValid(int iClient, bool bAlive = false)
 	iClient <= MaxClients &&
 	IsClientConnected(iClient) &&
 	IsClientInGame(iClient) &&
+	!IsFakeClient(iClient) &&
 	(bAlive == false || IsPlayerAlive(iClient)))
 	{
 		return true;
