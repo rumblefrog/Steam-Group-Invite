@@ -32,6 +32,7 @@ SOFTWARE.
 #include <steamcore>
 #include <morecolors>
 #include <bigint>
+#undef REQUIRE_EXTENSIONS
 #include <steamtools>
 
 #pragma newdecls required
