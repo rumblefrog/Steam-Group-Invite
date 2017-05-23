@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.5"
+#define PLUGIN_VERSION "1.2.0"
 
 #include <sourcemod>
 #include <SteamWorks>
@@ -38,10 +38,12 @@ SOFTWARE.
 #pragma newdecls required
 
 ConVar cGroupID;
+ConVar cAutoInvite;
 Handle InCoolDown;
 char GroupID[64];
 char GroupID32[64];
 bool InGroup[MAXPLAYERS + 1];
+bool AutoInvite;
 EngineVersion g_EngineVersion;
 
 public Plugin myinfo = 
@@ -61,7 +63,12 @@ public void OnPluginStart()
 	
 	cGroupID.GetString(GroupID, sizeof GroupID);
 	
-	HookConVarChange(cGroupID, OnGroupIDChanged);
+	cAutoInvite = CreateConVar("sgi_autoinvite", "0", "Automatically Invite To Group; If Not In Group Already", 0, true, 0.0, true, 1.0);
+	
+	AutoInvite = cAutoInvite.BoolValue;
+	
+	cGroupID.AddChangeHook(OnConVarChanged);
+	cAutoInvite.AddChangeHook(OnConVarChanged);
 		
 	RegConsoleCmd("sm_invite", InviteCmd, "Invites the client to desired Steam group");
 	RegConsoleCmd("sm_ingroup", InGroupCmd, "Checks if the client is in desired Steam group");
@@ -75,27 +82,7 @@ public void OnPluginStart()
 
 public Action InviteCmd(int client, int args)
 {
-	int AccountID = GetSteamAccountID(client);
-	
-	if (StrEqual(GroupID, "0"))
-	{
-		CPrintToChat(client, "{lightseagreen}[SGI] {grey}Group ID Convar not setup.");
-		return Plugin_Handled;
-	}
-	
-	if (FindValueInArray(InCoolDown, AccountID) != -1)
-	{
-		CPrintToChat(client, "{lightseagreen}[SGI] {grey}Please wait 4 minutes between requests.");
-		return Plugin_Handled;
-	}
-	
-	char SteamID64[32];
-	
-	GetClientAuthId(client, AuthId_SteamID64, SteamID64, sizeof SteamID64);
-	SteamGroupInvite(client, SteamID64, GroupID, SteamCore_CallBack);
-	
-	PushArrayCell(InCoolDown, AccountID);
-	CreateTimer(240.0, Core_Cooldown, AccountID);
+	InviteClient(client, false);
 
 	return Plugin_Handled;
 }
@@ -110,10 +97,56 @@ public Action InGroupCmd(int client, int args)
 	return Plugin_Handled;
 }
 
-public void OnGroupIDChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	cGroupID.GetString(GroupID, sizeof GroupID);
-	CalculateGroupID32();
+	if (convar == cGroupID)
+	{
+		cGroupID.GetString(GroupID, sizeof GroupID);
+		CalculateGroupID32();
+	}
+	
+	if (convar == cAutoInvite)
+		AutoInvite = cAutoInvite.BoolValue;
+}
+
+void InviteClient(int client, bool silent = false)
+{
+	if (StrEqual(GroupID, "0"))
+	{
+		if (!silent)
+			CPrintToChat(client, "{lightseagreen}[SGI] {grey}Group ID Convar not setup.");
+			
+		return;
+	}
+	
+	int AccountID = GetSteamAccountID(client);
+	
+	if (FindValueInArray(InCoolDown, AccountID) != -1)
+	{
+		if (!silent)
+			CPrintToChat(client, "{lightseagreen}[SGI] {grey}Please wait 4 minutes between requests.");
+			
+		return;
+	}
+	
+	char SteamID64[32];
+	
+	GetClientAuthId(client, AuthId_SteamID64, SteamID64, sizeof SteamID64);
+	
+	if (silent)
+		SteamGroupInvite(client, SteamID64, GroupID, SteamCore_SilentCall);
+	else
+		SteamGroupInvite(client, SteamID64, GroupID, SteamCore_CallBack);
+			
+	PushArrayCell(InCoolDown, AccountID);
+	CreateTimer(240.0, Core_Cooldown, AccountID);
+}
+
+void AttemptAutoInvite(int client)
+{
+	if (!AutoInvite || InGroup[client]) return;
+	
+	InviteClient(client, true);
 }
 
 void CalculateGroupID32()
@@ -188,6 +221,22 @@ public void SteamCore_CallBack(int iClient, bool bSuccess, int iErrorCode, any d
 	}
 }
 
+public void SteamCore_SilentCall(int iClient, bool bSuccess, int iErrorCode, any data)
+{
+	if (iClient != 0 && !IsClientInGame(iClient)) return;
+	
+	if (!bSuccess)
+	{
+		if (iErrorCode < 0x10 || iErrorCode == 0x23)
+		{
+			int i;
+	
+			if ((i = FindValueInArray(InCoolDown, data)) != -1)
+				RemoveFromArray(InCoolDown, i);
+		}
+	}
+}
+
 public void OnClientPostAdminCheck(int iClient)
 {
 	if (!StrEqual(GroupID32, "0"))
@@ -217,6 +266,8 @@ public int SteamWorks_OnClientGroupStatus(int authid, int groupid, bool isMember
 		return;
 	}
 	
+	AttemptAutoInvite(iClient);
+	
 	return;
 	
 }
@@ -236,6 +287,8 @@ public int Steam_GroupStatusResult(int client, int groupAccountID, bool groupMem
 		InGroup[client] = true;
 		return;
 	}
+	
+	AttemptAutoInvite(client);
 	
 	return;
 	
