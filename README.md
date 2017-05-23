@@ -26,7 +26,7 @@ A simple plugin that invites the player to the desired group on command trigger
 # Find Your Group ID64
 
 1. Goto https://steamcommunity.com/groups/MaxDBNET/memberslistxml/ (Replace **MaxDBNET** with your group name)
-2. Search for numbers encased in <groupID64> (Ex: <groupID64>103582791457828777</groupID64>)
+2. Search for numbers encased in `<groupID64>*</groupID64>` (Ex: <groupID64>103582791457828777</groupID64>)
 3. Use that number in [**sgi_groupid**](#convars)
 
 # Note
